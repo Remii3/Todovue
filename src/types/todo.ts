@@ -1,8 +1,14 @@
-type Todo = {
+export type Todo = {
   id: string;
   title: string;
-  completed: boolean;
+  description: string;
   createdAt: number;
-  deadline: number | null;
+  deadline: string | null;
   finishedAt: number | null;
+  status: "inProgress" | "done";
+  priority: "low" | "medium" | "high";
 };
+export type NewTodoType = Omit<
+  Todo,
+  "id" | "completed" | "createdAt" | "finishedAt"
+>;

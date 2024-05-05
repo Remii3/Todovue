@@ -8,7 +8,7 @@ export default async function fetchUserData(userId: string) {
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
-    return updateUserData(docSnap.data());
+    updateUserData({ ...docSnap.data(), uid: docSnap.id });
   } else {
     throw new Error("No such document!");
   }

@@ -54,7 +54,6 @@ const createUserData = async ({
       email,
       todos: [],
     });
-    console.log("UserData document created successfully!");
   } catch (error) {
     console.error("Error creating userData document: ", error);
   }

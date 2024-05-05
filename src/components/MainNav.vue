@@ -30,7 +30,7 @@ watch(user, (newUser) => {
 </script>
 
 <template>
-  <div class="shadow-sm bg-background fixed top-0 w-full">
+  <div class="shadow-sm bg-background z-10 fixed top-0 w-full">
     <nav class="max-w-screen-xl mx-auto px-4 flex justify-between items-center">
       <RouterLink to="/" class="flex items-center gap-1 py-1 px-3">
         <Rainbow class="h-9 w-9 text-green-600" />

@@ -1,3 +1,5 @@
+import type { Todo } from "./todo";
+
 export type User = {
   uid: string;
   email: string;
