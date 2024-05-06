@@ -5,14 +5,12 @@ import SelectContent from "../ui/select/SelectContent.vue";
 import SelectItem from "../ui/select/SelectItem.vue";
 import SelectTrigger from "../ui/select/SelectTrigger.vue";
 import SelectValue from "../ui/select/SelectValue.vue";
-
+import { priorityOptions, statusOptions } from "../../data/static";
 const priority = defineModel("priority", {
   type: String,
-  default: "all",
 });
 const status = defineModel("status", {
   type: String,
-  default: "all",
 });
 </script>
 <template>
@@ -24,10 +22,12 @@ const status = defineModel("status", {
           <SelectValue placeholder="Priority" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All</SelectItem>
-          <SelectItem value="low">Low</SelectItem>
-          <SelectItem value="medium">Medium</SelectItem>
-          <SelectItem value="high">High</SelectItem>
+          <SelectItem
+            v-for="option in priorityOptions"
+            :value="option.key"
+            :key="option.key"
+            >{{ option.text }}</SelectItem
+          >
         </SelectContent>
       </Select>
     </div>
@@ -38,9 +38,12 @@ const status = defineModel("status", {
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All</SelectItem>
-          <SelectItem value="inProgress">Ongoing</SelectItem>
-          <SelectItem value="done">Done</SelectItem>
+          <SelectItem
+            v-for="option in statusOptions"
+            :value="option.key"
+            :key="option.key"
+            >{{ option.text }}</SelectItem
+          >
         </SelectContent>
       </Select>
     </div>

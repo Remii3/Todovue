@@ -8,15 +8,26 @@ import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { ref } from "vue";
 import type { Todo } from "@/types/todo";
+import TodoSort from "./TodoSort.vue";
+import {
+  priorityOptions,
+  sortingOptions,
+  statusOptions,
+} from "../../data/static";
+import { sortTasks } from "@/helpers/sortTasks";
 
 const userState = useUserStore();
 const searchPrompt = ref("");
-const filters = ref({ priority: "all", status: "all" });
+const filters = ref({
+  priority: priorityOptions[0].key,
+  status: statusOptions[1].key,
+});
 const { user } = storeToRefs(userState);
+const sort = ref(sortingOptions[0].key);
 
 const tasksList = computed(() => {
   if (!user.value || !user.value.todos) return [];
-  return user.value.todos.filter((task: Todo) => {
+  const filteredTasks = user.value.todos.filter((task: Todo) => {
     const matchSearch = task.title
       .toLowerCase()
       .includes(searchPrompt.value.toLowerCase());
@@ -27,6 +38,8 @@ const tasksList = computed(() => {
       filters.value.priority === "all";
     return matchSearch && matchesStatus && matchesPriority;
   });
+
+  return sortTasks(filteredTasks, sort.value);
 });
 </script>
 
@@ -47,20 +60,34 @@ const tasksList = computed(() => {
           v-model:status="filters.status"
         />
       </div>
+
       <div
-        class="col-span-4 sm:col-span-3 col-start-1 sm:col-start-2 row-start-3 sm:row-start-2 grid lg:grid-cols-3 grid-cols-1 sm:grid-cols-2 gap-4"
-        v-if="user && user.todos.length > 0"
+        class="col-span-4 sm:col-span-3 col-start-1 sm:col-start-2 row-start-3 sm:row-start-2"
       >
-        <TodoItem
-          v-for="task in tasksList"
-          :task="task"
-          :user-id="user.uid"
-          :key="task.id"
-        />
-      </div>
-      <div v-else-if="user && user.todos.length <= 0"></div>
-      <div v-else>
-        <p class="text-center text-lg text-zinc-500">No user found.</p>
+        <div class="w-full flex items-end mb-4">
+          <TodoSort v-model:sort="sort" />
+        </div>
+
+        <div
+          class="grid lg:grid-cols-3 grid-cols-1 sm:grid-cols-2 gap-4"
+          v-if="user && user.todos.length > 0"
+        >
+          <TodoItem
+            v-for="task in tasksList"
+            :task="task"
+            :user-id="user.uid"
+            :key="task.id"
+          />
+        </div>
+        <div
+          v-else-if="user && user.todos.length <= 0"
+          class="text-zinc-600 h-full w-full flex items-center justify-center"
+        >
+          Add your first task!
+        </div>
+        <div v-else>
+          <p class="text-center text-lg text-zinc-500">No user found.</p>
+        </div>
       </div>
     </div>
   </main>

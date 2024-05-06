@@ -1,4 +1,5 @@
 <script setup>
+import Button from "@/components/ui/button/Button.vue";
 import { auth } from "@/lib/firebase";
 import { useUserStore } from "@/stores/user";
 import { signOut } from "firebase/auth";
@@ -16,6 +17,8 @@ const logoutHandler = async () => {
 
 <template>
   <div>
-    <button type="button" @click="logoutHandler">Logout</button>
+    <Button variant="destructive" type="button" @click="logoutHandler"
+      >Logout</Button
+    >
   </div>
 </template>

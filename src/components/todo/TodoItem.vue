@@ -103,7 +103,7 @@ const finishTaskHandler = async () => {
 </script>
 <template>
   <Card
-    :class="`relative rounded-md border-t-4  ${
+    :class="`relative rounded-md group/card overflow-hidden border-t-4  ${
       props.task.priority === 'low'
         ? 'border-t-green-600'
         : props.task.priority === 'medium'
@@ -224,6 +224,14 @@ const finishTaskHandler = async () => {
       v-if="isLoading"
     >
       <Loader2 class="h-6 w-6 animate-spin" />
+    </div>
+    <div
+      class="absolute top-0 left-0 h-full w-full flex items-center justify-center bg-zinc-50 opacity-80 rounded-lg group-hover/card:opacity-0 transition ease-in-out group-hover/card:top-full"
+      v-if="props.task.status === 'done'"
+    >
+      <span>{{
+        props.task.finishedAt! > props.task.deadline! ? "Failed" : "Finished"
+      }}</span>
     </div>
   </Card>
 </template>
