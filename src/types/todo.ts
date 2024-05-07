@@ -7,6 +7,7 @@ export type Todo = {
   finishedAt: string | null;
   status: "inProgress" | "done";
   priority: "low" | "medium" | "high";
+  category: { key: string; text: string };
 };
 export type NewTodoType = Omit<
   Todo,

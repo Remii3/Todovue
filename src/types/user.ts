@@ -5,5 +5,6 @@ export type User = {
   email: string;
   displayName: string;
   photoURL: string;
+  todoCategories: { key: string; text: string }[];
   todos: Todo[];
 };

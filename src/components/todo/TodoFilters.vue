@@ -6,11 +6,32 @@ import SelectItem from "../ui/select/SelectItem.vue";
 import SelectTrigger from "../ui/select/SelectTrigger.vue";
 import SelectValue from "../ui/select/SelectValue.vue";
 import { priorityOptions, statusOptions } from "../../data/static";
+import { useUserStore } from "@/stores/user";
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
+import type { Todo } from "@/types/todo";
+const userState = useUserStore();
+const { user } = storeToRefs(userState);
 const priority = defineModel("priority", {
   type: String,
 });
 const status = defineModel("status", {
   type: String,
+});
+const category = defineModel("category", {
+  type: String,
+});
+const tasksCategories = computed(() => {
+  if (!user.value || !user.value.todos) return [];
+  return user.value.todos.reduce(
+    (acc: { key: string; text: string }[], task: Todo) => {
+      if (!acc.includes(task.category)) {
+        acc.push(task.category);
+      }
+      return acc;
+    },
+    []
+  );
 });
 </script>
 <template>
@@ -40,6 +61,23 @@ const status = defineModel("status", {
         <SelectContent>
           <SelectItem
             v-for="option in statusOptions"
+            :value="option.key"
+            :key="option.key"
+            >{{ option.text }}</SelectItem
+          >
+        </SelectContent>
+      </Select>
+    </div>
+    <div class="w-full">
+      <Label for="categorySelector">Category</Label>
+      <Select id="categorySelector" v-model="category">
+        <SelectTrigger>
+          <SelectValue placeholder="Category" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All</SelectItem>
+          <SelectItem
+            v-for="option in tasksCategories"
             :value="option.key"
             :key="option.key"
             >{{ option.text }}</SelectItem

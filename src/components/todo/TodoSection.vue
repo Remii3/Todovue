@@ -17,12 +17,14 @@ import {
 import { sortTasks } from "@/helpers/sortTasks";
 
 const userState = useUserStore();
+const { user } = storeToRefs(userState);
+
 const searchPrompt = ref("");
 const filters = ref({
   priority: priorityOptions[0].key,
   status: statusOptions[1].key,
+  category: "all",
 });
-const { user } = storeToRefs(userState);
 const sort = ref(sortingOptions[0].key);
 
 const tasksList = computed(() => {
@@ -36,7 +38,10 @@ const tasksList = computed(() => {
     const matchesPriority =
       task.priority === filters.value.priority ||
       filters.value.priority === "all";
-    return matchSearch && matchesStatus && matchesPriority;
+    const matchCategory =
+      task.category.key === filters.value.category ||
+      filters.value.category === "all";
+    return matchSearch && matchesStatus && matchesPriority && matchCategory;
   });
 
   return sortTasks(filteredTasks, sort.value);
@@ -58,6 +63,7 @@ const tasksList = computed(() => {
         <TodoFilters
           v-model:priority="filters.priority"
           v-model:status="filters.status"
+          v-model:category="filters.category"
         />
       </div>
 

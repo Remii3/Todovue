@@ -15,7 +15,11 @@ const router = useRouter();
 
 onAuthStateChanged(auth, async (userAuth) => {
   if (userAuth) {
-    localStorage.setItem("user", userAuth.uid);
+    const userId = {
+      value: userAuth.uid,
+      expiration: new Date().getTime() + 10 * 60 * 1000,
+    };
+    localStorage.setItem("user", JSON.stringify(userId));
     await fetchUserData(userAuth.uid);
   } else {
     localStorage.removeItem("user");
@@ -26,11 +30,23 @@ onAuthStateChanged(auth, async (userAuth) => {
 
 router.beforeEach(async (to, from, next) => {
   await getAuth().authStateReady();
+
+  const parsedUserId = JSON.parse(
+    localStorage.getItem("user") ||
+      JSON.stringify({ value: null, expiration: 0 })
+  );
   if (
+    parsedUserId.expiration &&
+    new Date().getTime() > parsedUserId.expiration
+  ) {
+    localStorage.removeItem("user");
+    updateUserData(null);
+    next({ name: "login" });
+  } else if (
     (to.meta.requiresAuth && !auth.currentUser) ||
     (to.meta.requiresAuth &&
       auth.currentUser &&
-      auth.currentUser.uid !== localStorage.getItem("user"))
+      auth.currentUser.uid !== parsedUserId.value)
   ) {
     next({ name: "login" });
   } else {

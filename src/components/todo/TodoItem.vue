@@ -135,13 +135,13 @@ const finishTaskHandler = async () => {
             class="group"
             @click="finishTaskHandler"
           >
-            <SquareX
+            <SquareCheck
               v-if="props.task.status === 'inProgress'"
               class="h-5 w-5 group-hover:text-green-600 transition-colors ease-out duration-200"
             />
-            <SquareCheck
+            <SquareX
               v-else
-              class="h-5 w-5 group-hover:text-green-600 transition-colors ease-out duration-200"
+              class="h-5 w-5 group-hover:text-red-600 transition-colors ease-out duration-200"
             />
           </button>
           <Dialog :open="isShownEdit" @update:open="isShownEdit = false">
@@ -203,35 +203,41 @@ const finishTaskHandler = async () => {
         </div>
       </CardDescription>
     </CardHeader>
-    <CardContent>
+    <CardContent class="flex flex-col flex-grow">
       <h3 class="text-lg font-medium">{{ props.task.title }}</h3>
       <p class="text-zinc-500">{{ props.task.description }}</p>
     </CardContent>
-    <CardFooter class="flex justify-between">
-      <div class="text-zinc-400 flex gap-1 items-center">
-        <Calendar class="w-4 h-4" />
-        <span class="text-sm">{{ props.task.createdAt }}</span>
-      </div>
-      <div class="text-zinc-400 flex items-center gap-1">
-        <CalendarClock class="w-4 h-4" />
-        <span class="text-sm">
-          {{ props.task.deadline }}
-        </span>
+    <CardFooter class="flex flex-col items-stretch gap-2">
+      <p class="text-sm text-zinc-600 font-medium">
+        {{ props.task.category.text }}
+      </p>
+
+      <div class="flex justify-between">
+        <div class="text-zinc-400 flex gap-1 items-center">
+          <Calendar class="w-4 h-4" />
+          <span class="text-sm">{{ props.task.createdAt }}</span>
+        </div>
+        <div class="text-zinc-400 flex items-center gap-1">
+          <CalendarClock class="w-4 h-4" />
+          <span class="text-sm">
+            {{ props.task.deadline }}
+          </span>
+        </div>
       </div>
     </CardFooter>
+    <div
+      class="absolute top-0 left-0 h-full w-full flex items-center justify-center bg-zinc-50 opacity-80 rounded-lg group-hover/card:opacity-0 transition ease-in-out group-hover/card:top-full"
+      v-if="props.task.status === 'done'"
+    >
+      <span class="font-medium">{{
+        props.task.finishedAt! > props.task.deadline! ? "Failed" : "Finished"
+      }}</span>
+    </div>
     <div
       class="absolute top-0 left-0 h-full w-full flex items-center justify-center bg-zinc-50 opacity-80 rounded-lg"
       v-if="isLoading"
     >
       <Loader2 class="h-6 w-6 animate-spin" />
-    </div>
-    <div
-      class="absolute top-0 left-0 h-full w-full flex items-center justify-center bg-zinc-50 opacity-80 rounded-lg group-hover/card:opacity-0 transition ease-in-out group-hover/card:top-full"
-      v-if="props.task.status === 'done'"
-    >
-      <span>{{
-        props.task.finishedAt! > props.task.deadline! ? "Failed" : "Finished"
-      }}</span>
     </div>
   </Card>
 </template>

@@ -1,6 +1,6 @@
-import { db } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 import { useUserStore } from "@/stores/user";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default async function fetchUserData(userId: string) {
   const { updateUserData } = useUserStore();
@@ -9,7 +9,17 @@ export default async function fetchUserData(userId: string) {
 
   if (docSnap.exists()) {
     updateUserData({ ...docSnap.data(), uid: docSnap.id });
+    return { error: null };
   } else {
-    throw new Error("No such document!");
+    try {
+      await setDoc(doc(db, "userData", userId), {
+        email: auth.currentUser?.email,
+        todoCategories: [],
+        todos: [],
+      });
+    } catch (error) {
+      console.error("Error creating userData document: ", error);
+    }
+    return { error: "No such document!" };
   }
 }

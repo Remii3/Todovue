@@ -15,44 +15,41 @@ import Separator from "./ui/separator/Separator.vue";
 import { doc, setDoc } from "firebase/firestore";
 import fetchUserData from "@/helpers/fetchUserData";
 import CustomLoader from "./CustomLoader.vue";
+import { Eye, EyeOff } from "lucide-vue-next";
 
 const { type } = defineProps<{
   type: "login" | "register";
 }>();
 const email = ref("");
 const password = ref("");
-const name = ref("");
+const showPassword = ref(false);
 const router = useRouter();
 const isLoading = ref<"form" | "google" | "">("");
-
+const errorMessage = ref("");
 const fetchUser = async (userId: string) => {
   try {
-    fetchUserData(userId)
-      .then(() => {
-        router.push({ name: "home" });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  } catch (err) {
-    console.log(err);
+    await fetchUserData(userId);
+  } catch (error) {
+    console.error("Error fetching user data: ", error);
+    errorMessage.value = "An error occurred. Please try again.";
+    isLoading.value = "";
+    return;
   }
+  router.push({ name: "home" });
   isLoading.value = "";
 };
 const createUserData = async ({
   userId,
-  name,
   email,
 }: {
   userId: string;
-  name: string;
   email: string;
 }) => {
   try {
     await setDoc(doc(db, "userData", userId), {
-      name,
       email,
       todos: [],
+      todoCategories: [],
     });
   } catch (error) {
     console.error("Error creating userData document: ", error);
@@ -71,20 +68,18 @@ const googleAuthHandler = async () => {
         await createUserData({
           userId: user.uid,
           email: user.email || "",
-          name: user.displayName || "",
         });
       }
       await fetchUser(user.uid);
       isLoading.value = "";
     })
     .catch((error) => {
-      console.error(error);
+      console.error(error.message);
     });
 };
 const resetForm = () => {
   email.value = "";
   password.value = "";
-  name.value = "";
 };
 const submitHandler = () => {
   isLoading.value = "form";
@@ -96,7 +91,7 @@ const submitHandler = () => {
         resetForm();
       })
       .catch((error) => {
-        console.error(error);
+        console.error(error.message);
       });
   } else {
     createUserWithEmailAndPassword(auth, email.value, password.value)
@@ -105,13 +100,14 @@ const submitHandler = () => {
         createUserData({
           userId: user.uid,
           email: email.value,
-          name: name.value,
         });
         await fetchUser(user.uid);
         resetForm();
       })
       .catch((error) => {
         console.error(error);
+        errorMessage.value = error.message;
+        isLoading.value = "";
       });
   }
 };
@@ -179,22 +175,35 @@ const submitHandler = () => {
             v-model="email"
             required
             :disabled="isLoading === 'form'"
+            autocomplete="email"
           />
-        </div>
-        <div v-if="type === 'register'">
-          <Label for="name">Name</Label>
-          <Input id="name" type="text" name="name" v-model="name" required />
         </div>
         <div>
           <Label for="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            name="password"
-            v-model="password"
-            required
-            :disabled="isLoading === 'form'"
-          />
+          <div class="w-full relative">
+            <Input
+              id="password"
+              :type="showPassword ? 'text' : 'password'"
+              name="password"
+              v-model="password"
+              required
+              :disabled="isLoading === 'form'"
+              autocomplete="current-password"
+              class="pr-10"
+            />
+            <button
+              class="absolute top-0 right-0 p-2.5"
+              type="button"
+              @click="showPassword = !showPassword"
+            >
+              <div v-if="showPassword">
+                <Eye class="h-5 w-5" />
+              </div>
+              <div v-else>
+                <EyeOff class="h-5 w-5" />
+              </div>
+            </button>
+          </div>
         </div>
         <div>
           <Button type="submit" :disabled="isLoading === 'form'">
@@ -203,6 +212,12 @@ const submitHandler = () => {
             </span>
             <CustomLoader type="component" v-else />
           </Button>
+        </div>
+        <div
+          v-if="errorMessage"
+          class="text-red-600 text-sm font-medium text-center"
+        >
+          {{ errorMessage }}
         </div>
       </div>
 
