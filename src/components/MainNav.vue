@@ -34,7 +34,7 @@ watch(user, (newUser) => {
     <nav class="max-w-screen-xl mx-auto px-4 flex justify-between items-center">
       <RouterLink to="/" class="flex items-center gap-1 py-1 px-3">
         <Rainbow class="h-9 w-9 text-green-600" />
-        <span class="text-2xl font-medium"> Todovue </span>
+        <h1 class="text-2xl font-medium">Todovue</h1>
       </RouterLink>
       <ul class="flex items-center">
         <li v-for="(link, index) in routerLinks" :key="index">
