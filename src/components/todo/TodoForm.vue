@@ -39,7 +39,10 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import fetchUserData from "@/helpers/fetchUserData";
 import Textarea from "../ui/textarea/Textarea.vue";
+import DialogHeader from "../ui/dialog/DialogHeader.vue";
+
 const userState = useUserStore();
+const formRef = ref("formRef");
 const { user } = storeToRefs(userState);
 const formSchema = toTypedSchema(
   z.object({
@@ -96,6 +99,10 @@ const prepareCategory = (category: string) => {
     key: category.toLocaleLowerCase().replace(/\s+/g, "-"),
     text: category,
   };
+};
+
+const submitForm = () => {
+  formSubmitHandler();
 };
 
 const formSubmitHandler = handleSubmit((values) => {
@@ -188,165 +195,170 @@ const sortedCategories = computed(() => {
 </script>
 
 <template>
-  <DialogTitle>{{ props.title }}</DialogTitle>
-  <DialogDescription>{{ props.description }}</DialogDescription>
-  <form @submit="formSubmitHandler">
-    <div class="max-h-[80%] overflow-auto pr-4 pl-1">
-      <FormField name="title" v-slot="{ componentField }">
-        <FormItem>
-          <FormLabel>Title</FormLabel>
-          <FormControl>
-            <Input
-              :disabled="isLoading"
-              type="text"
-              placeholder="Title..."
-              v-bind="componentField"
-            />
-          </FormControl>
-          <FormDescription>The primary title of your task.</FormDescription>
-          <FormMessage /> </FormItem
-      ></FormField>
-      <FormField name="description" v-slot="{ componentField }">
-        <FormItem class="mt-4">
-          <FormLabel>Description</FormLabel>
-          <FormControl>
-            <Textarea
-              :disabled="isLoading"
-              placeholder="Description..."
-              v-bind="componentField"
-              rows="4"
-              class="resize-none"
-            />
-          </FormControl>
-          <FormDescription>The description of your task.</FormDescription>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      <FormField name="category" v-slot="{ componentField }">
-        <FormItem class="mt-4">
-          <FormLabel>Category</FormLabel>
-          <FormControl>
-            <Select v-bind="componentField" :disabled="isLoading">
-              <div class="flex gap-4">
-                <Input
-                  type="text"
-                  placeholder="Add new category..."
-                  v-model="newCategory"
-                  @input="newCategoryError = null"
-                />
-                <Button
-                  type="button"
-                  :disabled="
-                    newCategory.trim().length === 0 || isAddingNewCategory
-                  "
-                  @click="addNewCategoryHandler"
-                >
-                  <span v-if="!isAddingNewCategory"
-                    ><Plus class="w-6 h-6"
-                  /></span>
-                  <Loader2 v-else class="w-6 h-6 animate-spin" />
-                </Button>
-              </div>
-              <div
-                v-if="newCategoryError"
-                class="text-sm font-medium ml-1 text-red-600"
+  <DialogHeader class="p-6 pb-0">
+    <DialogTitle>{{ props.title }}</DialogTitle>
+    <DialogDescription>{{ props.description }}</DialogDescription>
+  </DialogHeader>
+  <form
+    ref="formRef"
+    class="grid gap-4 py-4 overflow-y-auto px-6"
+    @submit.prevent="formSubmitHandler"
+  >
+    <FormField name="title" v-slot="{ componentField }">
+      <FormItem>
+        <FormLabel>Title</FormLabel>
+        <FormControl>
+          <Input
+            :disabled="isLoading"
+            type="text"
+            placeholder="Title..."
+            v-bind="componentField"
+          />
+        </FormControl>
+        <FormDescription>The primary title of your task.</FormDescription>
+        <FormMessage /> </FormItem
+    ></FormField>
+    <FormField name="description" v-slot="{ componentField }">
+      <FormItem class="mt-4">
+        <FormLabel>Description</FormLabel>
+        <FormControl>
+          <Textarea
+            :disabled="isLoading"
+            placeholder="Description..."
+            v-bind="componentField"
+            rows="4"
+            class="resize-none"
+          />
+        </FormControl>
+        <FormDescription>The description of your task.</FormDescription>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+    <FormField name="category" v-slot="{ componentField }">
+      <FormItem class="mt-4">
+        <FormLabel>Category</FormLabel>
+        <FormControl>
+          <Select v-bind="componentField" :disabled="isLoading">
+            <div class="flex gap-4">
+              <Input
+                type="text"
+                placeholder="Add new category..."
+                v-model="newCategory"
+                @input="newCategoryError = null"
+              />
+              <Button
+                type="button"
+                :disabled="
+                  newCategory.trim().length === 0 || isAddingNewCategory
+                "
+                @click="addNewCategoryHandler"
               >
-                {{ newCategoryError }}
+                <span v-if="!isAddingNewCategory"
+                  ><Plus class="w-6 h-6"
+                /></span>
+                <Loader2 v-else class="w-6 h-6 animate-spin" />
+              </Button>
+            </div>
+            <div
+              v-if="newCategoryError"
+              class="text-sm font-medium ml-1 text-red-600"
+            >
+              {{ newCategoryError }}
+            </div>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a category"
+            /></SelectTrigger>
+
+            <SelectContent>
+              <div
+                v-for="category in sortedCategories"
+                :key="category.key"
+                class="relative"
+              >
+                <SelectItem :value="category.key"
+                  >{{ category.text }}
+                </SelectItem>
+                <button
+                  class="absolute top-0 right-0 p-2"
+                  type="button"
+                  :disabled="isRemovingCategory || isAddingNewCategory"
+                  @click="removeCategory(category)"
+                >
+                  <Trash2 class="h-5 w-5" />
+                </button>
               </div>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category"
-              /></SelectTrigger>
 
-              <SelectContent>
-                <div
-                  v-for="category in sortedCategories"
-                  :key="category.key"
-                  class="relative"
-                >
-                  <SelectItem :value="category.key"
-                    >{{ category.text }}
-                  </SelectItem>
-                  <button
-                    class="absolute top-0 right-0 p-2"
-                    type="button"
-                    :disabled="isRemovingCategory || isAddingNewCategory"
-                    @click="removeCategory(category)"
-                  >
-                    <Trash2 class="h-5 w-5" />
-                  </button>
-                </div>
-
-                <SelectItem
-                  v-if="
-                    !user ||
-                    !user.todoCategories ||
-                    user.todoCategories.length <= 0
-                  "
-                  disabled
-                  aria-readonly="true"
-                  value="no-category"
-                  >No category</SelectItem
-                >
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormDescription>The category of your task.</FormDescription>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      <FormField name="priority" v-slot="{ componentField }">
-        <FormItem class="mt-4">
-          <FormLabel>Priority</FormLabel>
-          <FormControl>
-            <Select v-bind="componentField" :disabled="isLoading">
-              <SelectTrigger>
-                <SelectValue placeholder="Select a priority"
-              /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormDescription>The priority of your task.</FormDescription>
-          <FormMessage />
-        </FormItem>
-      </FormField>
-      <FormField name="deadline">
-        <FormItem class="mt-4">
-          <FormLabel>Deadline</FormLabel>
-          <Popover>
-            <PopoverTrigger as-child>
-              <FormControl class="flex">
-                <Button
-                  variant="outline"
-                  :disabled="isLoading"
-                  :class="
-                    cn(
-                      'w-[240px] ps-3 text-start font-normal',
-                      !value && 'text-muted-foreground'
-                    )
-                  "
-                >
-                  <span>{{
-                    value ? df.format(toDate(value)) : "Pick a date"
-                  }}</span>
-                  <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
-                </Button>
-                <input hidden />
-              </FormControl>
-              <FormDescription>The deadline for your task.</FormDescription>
-              <FormMessage />
-            </PopoverTrigger>
-            <PopoverContent class="w-auto p-0">
-              <Calendar
-                v-model:placeholder="placeholder"
-                v-model="value"
-                calendar-label="Date of birth"
-                initial-focus
-                :min-value="today(getLocalTimeZone())"
-                @update:model-value="
+              <SelectItem
+                v-if="
+                  !user ||
+                  !user.todoCategories ||
+                  user.todoCategories.length <= 0
+                "
+                disabled
+                aria-readonly="true"
+                value="no-category"
+                >No category</SelectItem
+              >
+            </SelectContent>
+          </Select>
+        </FormControl>
+        <FormDescription>The category of your task.</FormDescription>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+    <FormField name="priority" v-slot="{ componentField }">
+      <FormItem class="mt-4">
+        <FormLabel>Priority</FormLabel>
+        <FormControl>
+          <Select v-bind="componentField" :disabled="isLoading">
+            <SelectTrigger>
+              <SelectValue placeholder="Select a priority"
+            /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="low">Low</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="high">High</SelectItem>
+            </SelectContent>
+          </Select>
+        </FormControl>
+        <FormDescription>The priority of your task.</FormDescription>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+    <FormField name="deadline">
+      <FormItem class="mt-4">
+        <FormLabel>Deadline</FormLabel>
+        <Popover>
+          <PopoverTrigger as-child>
+            <FormControl class="flex">
+              <Button
+                variant="outline"
+                :disabled="isLoading"
+                :class="
+                  cn(
+                    'w-[240px] ps-3 text-start font-normal',
+                    !value && 'text-muted-foreground'
+                  )
+                "
+              >
+                <span>{{
+                  value ? df.format(toDate(value)) : "Pick a date"
+                }}</span>
+                <CalendarIcon class="ms-auto h-4 w-4 opacity-50" />
+              </Button>
+              <input hidden />
+            </FormControl>
+            <FormDescription>The deadline for your task.</FormDescription>
+            <FormMessage />
+          </PopoverTrigger>
+          <PopoverContent class="w-auto p-0">
+            <Calendar
+              v-model:placeholder="placeholder"
+              v-model="value"
+              calendar-label="Date of birth"
+              initial-focus
+              :min-value="today(getLocalTimeZone())"
+              @update:model-value="
                     (v:any) => {
                       if (v) {
                         setValues({
@@ -359,18 +371,22 @@ const sortedCategories = computed(() => {
                       }
                     }
                   "
-              />
-            </PopoverContent>
-          </Popover>
-        </FormItem>
-      </FormField>
-    </div>
-
-    <DialogFooter>
-      <Button type="submit" :disabled="isLoading" class="mt-4">
-        <span v-if="!isLoading"> {{ props.submitButtonText }} </span>
-        <Loader2 v-else class="w-6 h-6 animate-spin" />
-      </Button>
-    </DialogFooter>
+            />
+          </PopoverContent>
+        </Popover>
+      </FormItem>
+    </FormField>
   </form>
+
+  <DialogFooter class="p-6 pt-0">
+    <Button
+      type="button"
+      @click="submitForm"
+      :disabled="isLoading"
+      class="mt-4"
+    >
+      <span v-if="!isLoading"> {{ props.submitButtonText }} </span>
+      <Loader2 v-else class="w-6 h-6 animate-spin" />
+    </Button>
+  </DialogFooter>
 </template>

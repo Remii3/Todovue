@@ -18,7 +18,13 @@ export const sortTasks = (tasks: Todo[], sorting: string) => {
       aValue = priorityMap[aValue as string];
       bValue = priorityMap[bValue as string];
     }
-
+    if (sortBy === "title") {
+      const aLower = (aValue as string)?.toLowerCase().replace(/[^a-z]/g, "");
+      const bLower = (bValue as string)?.toLowerCase().replace(/[^a-z]/g, "");
+      return sortOrder === "Asc"
+        ? aLower.localeCompare(bLower)
+        : bLower.localeCompare(aLower);
+    }
     if (sortOrder === "Asc") {
       return aValue! > bValue! ? 1 : -1;
     } else {

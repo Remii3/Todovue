@@ -158,7 +158,9 @@ const finishTaskHandler = async () => {
                 />
               </button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent
+              class="grid-rows-[auto_minmax(0,1fr)_auto] p-0 max-h-[90dvh]"
+            >
               <TodoForm
                 :submit-handler="editTask"
                 title="Edit task"

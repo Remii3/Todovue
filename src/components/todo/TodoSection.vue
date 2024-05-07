@@ -75,7 +75,7 @@ const tasksList = computed(() => {
         </div>
 
         <div
-          class="grid lg:grid-cols-3 grid-cols-1 sm:grid-cols-2 gap-4"
+          class="grid lg:grid-cols-3 grid-cols-1 sm:grid-cols-2 gap-4 max-h-[1000px] overflow-y-auto"
           v-if="user && user.todos.length > 0"
         >
           <TodoItem

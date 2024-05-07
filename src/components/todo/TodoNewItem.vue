@@ -65,7 +65,9 @@ const uploadNewTask = async (values: any) => {
         <Plus class="w-6 h-6 sm:ml-2"
       /></Button>
     </DialogTrigger>
-    <DialogContent>
+    <DialogContent
+      class="grid-rows-[auto_minmax(0,1fr)_auto] p-0 max-h-[90dvh]"
+    >
       <TodoForm
         :submit-handler="uploadNewTask"
         title="Add new task"
