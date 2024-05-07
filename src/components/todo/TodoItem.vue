@@ -103,7 +103,7 @@ const finishTaskHandler = async () => {
 </script>
 <template>
   <Card
-    :class="`relative rounded-md group/card overflow-hidden border-t-4  ${
+    :class="`relative flex flex-col rounded-md group/card overflow-hidden border-t-4  ${
       props.task.priority === 'low'
         ? 'border-t-green-600'
         : props.task.priority === 'medium'

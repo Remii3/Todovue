@@ -25,7 +25,7 @@ const tasksCategories = computed(() => {
   if (!user.value || !user.value.todos) return [];
   return user.value.todos.reduce(
     (acc: { key: string; text: string }[], task: Todo) => {
-      if (!acc.includes(task.category)) {
+      if (!acc.some((category) => category.key === task.category.key)) {
         acc.push(task.category);
       }
       return acc;
