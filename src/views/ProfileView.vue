@@ -146,6 +146,7 @@ const doneTodosQuantity = computed(() => {
           variant="outline"
           :disabled="isLoggingOut || isDeleting"
           @click="logoutHandler"
+          data-cy="logout"
         >
           <span v-if="!isLoggingOut">Logout</span>
           <Loader2 v-else class="h-6 w-6 animate-spin" />
@@ -154,6 +155,7 @@ const doneTodosQuantity = computed(() => {
           variant="destructive"
           :disabled="isLoggingOut || isDeleting || reauthenticateNeeded"
           @click="deleteAccount"
+          data-cy="delete-account"
           ><span v-if="!isDeleting">Delete Account</span
           ><Loader2 v-else class="h-6 w-6 animate-spin"
         /></Button>

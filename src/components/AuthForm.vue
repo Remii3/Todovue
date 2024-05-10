@@ -2,7 +2,6 @@
 import { ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import Input from "./ui/input/Input.vue";
-import Label from "./ui/label/Label.vue";
 import Button from "./ui/button/Button.vue";
 import {
   GoogleAuthProvider,
@@ -16,16 +15,43 @@ import { doc, setDoc } from "firebase/firestore";
 import fetchUserData from "@/helpers/fetchUserData";
 import CustomLoader from "./CustomLoader.vue";
 import { Eye, EyeOff } from "lucide-vue-next";
+import { useForm } from "vee-validate";
+import * as z from "zod";
+import {
+  FormField,
+  FormControl,
+  FormDescription,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+import { toTypedSchema } from "@vee-validate/zod";
 
 const { type } = defineProps<{
   type: "login" | "register";
 }>();
-const email = ref("");
-const password = ref("");
 const showPassword = ref(false);
 const router = useRouter();
 const isLoading = ref<"form" | "google" | "">("");
 const errorMessage = ref("");
+
+const authSchema = toTypedSchema(
+  z.object({
+    email: z.string().email({ message: "Please enter a valid email address." }),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters long." }),
+  })
+);
+
+const { handleSubmit, resetForm } = useForm({
+  validationSchema: authSchema,
+  initialValues: {
+    email: "",
+    password: "",
+  },
+});
+
 const fetchUser = async (userId: string) => {
   try {
     await fetchUserData(userId);
@@ -38,6 +64,7 @@ const fetchUser = async (userId: string) => {
   router.push({ name: "home" });
   isLoading.value = "";
 };
+
 const createUserData = async ({
   userId,
   email,
@@ -55,6 +82,7 @@ const createUserData = async ({
     console.error("Error creating userData document: ", error);
   }
 };
+
 const googleAuthHandler = async () => {
   const provider = new GoogleAuthProvider();
   signInWithPopup(auth, provider)
@@ -77,14 +105,11 @@ const googleAuthHandler = async () => {
       console.error(error.message);
     });
 };
-const resetForm = () => {
-  email.value = "";
-  password.value = "";
-};
-const submitHandler = () => {
+
+const submitHandler = handleSubmit((values) => {
   isLoading.value = "form";
   if (type === "login") {
-    signInWithEmailAndPassword(auth, email.value, password.value)
+    signInWithEmailAndPassword(auth, values.email, values.password)
       .then(async (userCredential) => {
         const user = userCredential.user;
         await fetchUser(user.uid);
@@ -94,12 +119,12 @@ const submitHandler = () => {
         console.error(error.message);
       });
   } else {
-    createUserWithEmailAndPassword(auth, email.value, password.value)
+    createUserWithEmailAndPassword(auth, values.email, values.password)
       .then(async (userCredential) => {
         const user = userCredential.user;
         createUserData({
           userId: user.uid,
-          email: email.value,
+          email: values.email,
         });
         await fetchUser(user.uid);
         resetForm();
@@ -110,19 +135,19 @@ const submitHandler = () => {
         isLoading.value = "";
       });
   }
-};
+});
 </script>
 
 <template>
   <main class="h-screen -mt-16 flex items-center justify-center">
-    <form class="sm:mb-24" @submit.prevent="submitHandler">
-      <legend class="text-4xl font-medium">
+    <form class="sm:mb-24" @submit="submitHandler">
+      <h1 class="text-4xl font-medium">
         {{
           type === "login"
             ? "Good to see you again!"
             : "Nice to see a new face!"
         }}
-      </legend>
+      </h1>
       <div class="space-y-4 mt-8">
         <div>
           <Button
@@ -166,47 +191,64 @@ const submitHandler = () => {
           </Button>
         </div>
         <Separator />
+        <FormField name="email" v-slot="{ componentField }">
+          <FormItem>
+            <FormLabel>Email</FormLabel>
+            <FormControl>
+              <Input
+                placeholder="Email..."
+                v-bind="componentField"
+                :disabled="isLoading === 'form'"
+                autocomplete="email"
+                data-cy="email"
+              />
+            </FormControl>
+            <FormDescription>
+              We'll never share your email with anyone else.
+            </FormDescription>
+            <FormMessage data-cy="error-email" />
+          </FormItem>
+        </FormField>
+        <FormField name="password" v-slot="{ componentField }">
+          <FormItem>
+            <FormLabel>Password</FormLabel>
+            <FormControl>
+              <div class="w-full relative">
+                <Input
+                  :type="showPassword ? 'text' : 'password'"
+                  v-bind="componentField"
+                  :disabled="isLoading === 'form'"
+                  placeholder="Password..."
+                  autocomplete="current-password"
+                  data-cy="password"
+                />
+                <button
+                  class="absolute top-0 right-0 p-2.5"
+                  type="button"
+                  @click="showPassword = !showPassword"
+                >
+                  <div v-if="showPassword">
+                    <Eye class="h-5 w-5" />
+                  </div>
+                  <div v-else>
+                    <EyeOff class="h-5 w-5" />
+                  </div>
+                </button>
+              </div>
+            </FormControl>
+            <FormDescription>
+              Please provide a password with at least 6 characters.
+            </FormDescription>
+            <FormMessage data-cy="error-password" />
+          </FormItem>
+        </FormField>
+
         <div>
-          <Label for="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            name="email"
-            v-model="email"
-            required
+          <Button
+            data-cy="submit"
+            type="submit"
             :disabled="isLoading === 'form'"
-            autocomplete="email"
-          />
-        </div>
-        <div>
-          <Label for="password">Password</Label>
-          <div class="w-full relative">
-            <Input
-              id="password"
-              :type="showPassword ? 'text' : 'password'"
-              name="password"
-              v-model="password"
-              required
-              :disabled="isLoading === 'form'"
-              autocomplete="current-password"
-              class="pr-10"
-            />
-            <button
-              class="absolute top-0 right-0 p-2.5"
-              type="button"
-              @click="showPassword = !showPassword"
-            >
-              <div v-if="showPassword">
-                <Eye class="h-5 w-5" />
-              </div>
-              <div v-else>
-                <EyeOff class="h-5 w-5" />
-              </div>
-            </button>
-          </div>
-        </div>
-        <div>
-          <Button type="submit" :disabled="isLoading === 'form'">
+          >
             <span v-if="isLoading !== 'form'">
               {{ type === "login" ? "Login" : "Register" }}
             </span>

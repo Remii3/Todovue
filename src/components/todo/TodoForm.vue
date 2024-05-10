@@ -107,8 +107,11 @@ const submitForm = () => {
 
 const formSubmitHandler = handleSubmit((values) => {
   let hasErrors = false;
-  if (values.title.trim().length === 0) {
-    setFieldError("title", "Please type some Title.");
+  if (!values.title || values.title.trim().length <= 1) {
+    setFieldError(
+      "title",
+      "Please type a title that is longer than 1 character."
+    );
     hasErrors = true;
   }
   if (!values.deadline || values.deadline.trim().length === 0) {

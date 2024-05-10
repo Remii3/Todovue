@@ -42,6 +42,7 @@ watch(user, (newUser) => {
             :to="link.to"
             class="pt-4 pb-3 px-3 border-b-2 border-b-transparent block"
             active-class="border-b-green-600"
+            :data-cy="link.text.toLowerCase() + '-link'"
           >
             <div v-if="link.text === 'User'">
               <User class="h-6 w-6" />
