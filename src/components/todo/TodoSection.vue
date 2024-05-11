@@ -10,22 +10,22 @@ import { ref } from "vue";
 import type { Todo } from "@/types/todo";
 import TodoSort from "./TodoSort.vue";
 import {
-  priorityOptions,
-  sortingOptions,
-  statusOptions,
+  taskPriorityOptions,
+  taskSortOptions,
+  taskStatusOptions,
 } from "../../data/static";
-import { sortTasks } from "@/helpers/sortTasks";
+import { sortTasks } from "@/lib/utils";
 
 const userState = useUserStore();
 const { user } = storeToRefs(userState);
 
 const searchPrompt = ref("");
 const filters = ref({
-  priority: priorityOptions[0].key,
-  status: statusOptions[1].key,
+  priority: taskPriorityOptions[0].key,
+  status: taskStatusOptions[1].key,
   category: "all",
 });
-const sort = ref(sortingOptions[0].key);
+const sort = ref(taskSortOptions[0].key);
 
 const tasksList = computed(() => {
   if (!user.value || !user.value.todos) return [];

@@ -11,10 +11,10 @@ import { db } from "@/lib/firebase";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { v4 } from "uuid";
-import fetchUserData from "@/helpers/fetchUserData";
+import { fetchUserData } from "@/lib/utils";
 import TodoForm from "./TodoForm.vue";
 import type { Todo } from "@/types/todo";
-import { getCurrentTime } from "@/helpers/currentTime";
+import { getCurrentTime } from "@/lib/utils";
 
 const shownModal = ref(false);
 const isLoading = ref(false);

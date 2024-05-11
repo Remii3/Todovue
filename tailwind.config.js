@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import animate from "tailwindcss-animate";
 
 /** @type {import('tailwindcss').Config} */

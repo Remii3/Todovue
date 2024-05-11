@@ -5,7 +5,7 @@ import SelectContent from "../ui/select/SelectContent.vue";
 import SelectItem from "../ui/select/SelectItem.vue";
 import SelectTrigger from "../ui/select/SelectTrigger.vue";
 import SelectValue from "../ui/select/SelectValue.vue";
-import { sortingOptions } from "@/data/static";
+import { taskSortOptions } from "@/data/static";
 const sort = defineModel("sort", {
   type: String,
 });
@@ -20,7 +20,7 @@ const sort = defineModel("sort", {
       </SelectTrigger>
       <SelectContent>
         <SelectItem
-          v-for="option in sortingOptions"
+          v-for="option in taskSortOptions"
           :value="option.key"
           :key="option.key"
           >{{ option.text }}</SelectItem

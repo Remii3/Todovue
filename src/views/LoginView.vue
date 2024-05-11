@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import AuthForm from "@/components/AuthForm.vue";
+import MainContainer from "@/components/MainContainer.vue";
 </script>
 
 <template>
-  <AuthForm type="login" />
+  <MainContainer with-height class="flex items-center justify-center">
+    <h1 class="sr-only">SignIn</h1>
+    <AuthForm type="login" />
+  </MainContainer>
 </template>

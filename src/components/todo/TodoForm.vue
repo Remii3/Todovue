@@ -37,7 +37,7 @@ import { storeToRefs } from "pinia";
 import { useUserStore } from "@/stores/user";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import fetchUserData from "@/helpers/fetchUserData";
+import { fetchUserData } from "@/lib/utils";
 import Textarea from "../ui/textarea/Textarea.vue";
 import DialogHeader from "../ui/dialog/DialogHeader.vue";
 
@@ -126,11 +126,11 @@ const formSubmitHandler = handleSubmit((values) => {
     setFieldError("category", "Please choose a category.");
     hasErrors = true;
   }
-  if (hasErrors) return;
-  const preparedCategory = user.value?.todoCategories.find(
+  if (hasErrors || !user.value) return;
+  const preparedCategory = user.value.todoCategories.find(
     (category: { key: string; text: string }) =>
       category.key === values.category
-  );
+  ) || { key: "", text: "" };
   const preparedValues = {
     ...values,
     category: prepareCategory(preparedCategory.text),

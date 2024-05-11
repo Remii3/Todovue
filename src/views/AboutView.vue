@@ -1,7 +1,11 @@
+<script setup lang="ts">
+import MainContainer from "@/components/MainContainer.vue";
+</script>
+
 <template>
-  <main>
-    <section class="about max-w-screen-lg mx-auto mt-20 sm:mt-44">
-      <h2 class="text-5xl mb-4 font-semibold">About Todovue</h2>
+  <MainContainer>
+    <section class="max-w-screen-lg mx-auto mt-20 sm:mt-44">
+      <h1 class="text-5xl mb-4 font-semibold">About Todovue</h1>
       <p class="text-xl sm:w-1/2 mb-12">
         Welcome to the ToDo App! This application is designed to help you manage
         your tasks more effectively. Whether you're organizing your daily
@@ -51,5 +55,5 @@
         </li>
       </ul>
     </section>
-  </main>
+  </MainContainer>
 </template>

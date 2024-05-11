@@ -5,7 +5,6 @@ import {
   CalendarCheck,
   CalendarClock,
   Edit,
-  Loader2,
   SquareCheck,
   SquareX,
   Trash2,
@@ -16,7 +15,7 @@ import CardDescription from "../ui/card/CardDescription.vue";
 import CardHeader from "../ui/card/CardHeader.vue";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import fetchUserData from "@/helpers/fetchUserData";
+import { fetchUserData } from "@/lib/utils";
 import { ref } from "vue";
 import DialogTrigger from "../ui/dialog/DialogTrigger.vue";
 import Dialog from "../ui/dialog/Dialog.vue";
@@ -29,7 +28,8 @@ import Button from "../ui/button/Button.vue";
 import type { Todo } from "@/types/todo";
 import CardFooter from "../ui/card/CardFooter.vue";
 import type { User } from "@/types/user";
-import { getCurrentTime } from "@/helpers/currentTime";
+import { getCurrentTime } from "@/lib/utils";
+import CustomLoader from "../loader/CustomLoader.vue";
 
 const isLoading = ref(false);
 const isShownEdit = ref(false);
@@ -196,8 +196,7 @@ const finishTaskHandler = async () => {
                   @click="removeTask"
                   :disabled="isLoading"
                 >
-                  <span v-if="!isLoading">Remove</span
-                  ><Loader2 v-else class="h-6 w-6 animate-spin"
+                  <span v-if="!isLoading">Remove</span><CustomLoader v-else
                 /></Button>
               </DialogFooter>
             </DialogContent>
@@ -239,7 +238,7 @@ const finishTaskHandler = async () => {
       class="absolute top-0 left-0 h-full w-full flex items-center justify-center bg-zinc-50 opacity-80 rounded-lg"
       v-if="isLoading"
     >
-      <Loader2 class="h-6 w-6 animate-spin" />
+      <CustomLoader />
     </div>
   </Card>
 </template>

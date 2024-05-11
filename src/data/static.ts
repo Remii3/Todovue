@@ -1,4 +1,4 @@
-export const sortingOptions = [
+export const taskSortOptions = [
   { key: "createdAt, Desc", text: "Created At, Desc" },
   { key: "createdAt, Asc", text: "Created At, Asc" },
   { key: "priority, Desc", text: "Priority, Desc" },
@@ -11,13 +11,13 @@ export const sortingOptions = [
   { key: "title, Asc", text: "Title, Asc" },
 ];
 
-export const priorityOptions = [
+export const taskPriorityOptions = [
   { key: "all", text: "All" },
   { key: "low", text: "Low" },
   { key: "medium", text: "Medium" },
   { key: "high", text: "High" },
 ];
-export const statusOptions = [
+export const taskStatusOptions = [
   { key: "all", text: "All" },
   { key: "inProgress", text: "Ongoing" },
   { key: "done", text: "Done" },

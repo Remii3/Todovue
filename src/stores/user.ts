@@ -1,12 +1,11 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import type { User } from "@/types/user";
-import type { DocumentData } from "firebase/firestore";
 
 export const useUserStore = defineStore("user", () => {
-  const user = ref<User | DocumentData | null>(null);
+  const user = ref<User | null>(null);
 
-  function updateUserData(userData: User | DocumentData | null) {
+  function updateUserData(userData: User | null) {
     user.value = userData;
     return user.value;
   }

@@ -5,7 +5,7 @@ import SelectContent from "../ui/select/SelectContent.vue";
 import SelectItem from "../ui/select/SelectItem.vue";
 import SelectTrigger from "../ui/select/SelectTrigger.vue";
 import SelectValue from "../ui/select/SelectValue.vue";
-import { priorityOptions, statusOptions } from "../../data/static";
+import { taskPriorityOptions, taskStatusOptions } from "../../data/static";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
@@ -44,7 +44,7 @@ const tasksCategories = computed(() => {
         </SelectTrigger>
         <SelectContent>
           <SelectItem
-            v-for="option in priorityOptions"
+            v-for="option in taskPriorityOptions"
             :value="option.key"
             :key="option.key"
             >{{ option.text }}</SelectItem
@@ -60,7 +60,7 @@ const tasksCategories = computed(() => {
         </SelectTrigger>
         <SelectContent>
           <SelectItem
-            v-for="option in statusOptions"
+            v-for="option in taskStatusOptions"
             :value="option.key"
             :key="option.key"
             >{{ option.text }}</SelectItem

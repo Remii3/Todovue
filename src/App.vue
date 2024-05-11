@@ -2,12 +2,11 @@
 import { auth } from "./lib/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import MainNav from "./components/MainNav.vue";
-import MainContainer from "./components/MainContainer.vue";
 import { ref } from "vue";
-import fetchUserData from "./helpers/fetchUserData";
+import { fetchUserData } from "./lib/utils";
 import { useUserStore } from "./stores/user";
-import CustomLoader from "./components/CustomLoader.vue";
 import { RouterView, useRouter } from "vue-router";
+import ScreenLoader from "./components/loader/ScreenLoader.vue";
 
 const isLoading = ref(true);
 const { updateUserData } = useUserStore();
@@ -28,7 +27,7 @@ onAuthStateChanged(auth, async (userAuth) => {
   isLoading.value = false;
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _, next) => {
   await getAuth().authStateReady();
 
   const parsedUserId = JSON.parse(
@@ -56,9 +55,7 @@ router.beforeEach(async (to, from, next) => {
 </script>
 
 <template>
-  <CustomLoader v-if="isLoading" :type="'screen'" />
+  <ScreenLoader v-if="isLoading" type="screen" />
   <MainNav v-if="!isLoading" />
-  <MainContainer v-if="!isLoading">
-    <RouterView />
-  </MainContainer>
+  <RouterView v-if="!isLoading" />
 </template>
