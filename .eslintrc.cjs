@@ -16,8 +16,20 @@ module.exports = {
       ],
       extends: ["plugin:cypress/recommended"],
     },
+    {
+      files: ["src/components/ui/**/*.{vue,js,jsx,ts,tsx}"],
+      rules: {
+        "vue/multi-word-component-names": "off",
+      },
+    },
   ],
   parserOptions: {
     ecmaVersion: "latest",
+  },
+  rules: {
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { varsIgnorePattern: "^_$" },
+    ],
   },
 };
